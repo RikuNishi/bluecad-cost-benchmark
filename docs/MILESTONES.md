@@ -18,7 +18,7 @@
   - 完了条件：文献値と再現値の差を記録できる
 - [ ] **M4（第5–8週）Qwen 追試**
   - [x] zero-shot 推論・共通 manifest からの追加学習・評価コード、pod スクリプト、テスト
-  - [ ] Qwen3-VL 8B zero-shot 推論（GPU、24GB、batch=1）
+  - [x] Qwen3-VL 8B zero-shot 推論（GPU、24GB、batch=1）— 2026-11-08 完了（Task 1 0.653 / 1-dim 0.632 / Task 2 0.334、docs/M4_RESULTS.md）
   - [ ] 公式方式の追加学習（共通 20,000 ペア manifest）
   - 完了条件：精度差と費用差の初期評価ができる
 - [ ] **M5（第5–8週）EmbeddingGemma 2 部分更新**
