@@ -16,10 +16,10 @@
 - [x] **M3（第3–4週）凍結特徴の追試** — 2026-11-07 GPU実行完了（結果は docs/M3_RESULTS.md）
   - SigLIP 2 / EmbeddingGemma 2 の特徴抽出（GPU）＋共通 head
   - 完了条件：文献値と再現値の差を記録できる
-- [ ] **M4（第5–8週）Qwen 追試**
+- [x] **M4（第5–8週）Qwen 追試** — 2026-11-08 完了（結果は docs/M4_RESULTS.md）
   - [x] zero-shot 推論・共通 manifest からの追加学習・評価コード、pod スクリプト、テスト
   - [x] Qwen3-VL 8B zero-shot 推論（GPU、24GB、batch=1）— 2026-11-08 完了（Task 1 0.653 / 1-dim 0.632 / Task 2 0.334、docs/M4_RESULTS.md）
-  - [ ] 公式方式の追加学習（共通 20,000 ペア manifest）
+  - [x] 公式方式の追加学習（共通 20,000 ペア manifest）— 2026-11-08 完了（QLoRA rank 16, lr 1e-4, 1 epoch；Task 1 0.748 / 1-dim 0.675 / Task 2 0.195、学習 3.05 GPU-h）
   - 完了条件：精度差と費用差の初期評価ができる
 - [ ] **M5（第5–8週）EmbeddingGemma 2 部分更新**
   - 更新範囲を小規模実測で決めてから本実行
