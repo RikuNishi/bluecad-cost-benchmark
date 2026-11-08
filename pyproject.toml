@@ -23,6 +23,9 @@ gpu = [
     "sentence-transformers",
     "scikit-learn",
     "pillow",
+    # transformers.apply_chat_template needs jinja2>=3.1.6; the RunPod
+    # base image ships 3.1.4 (M4 Run A failed on this, 2026-11-08).
+    "jinja2>=3.1.6",
 ]
 
 [tool.setuptools.packages.find]
