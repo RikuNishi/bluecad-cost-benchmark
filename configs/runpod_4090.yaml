@@ -1,0 +1,22 @@
+# RunPod execution environment profile (decided 2026-11-07).
+# Rates are list prices checked 2026-11-07; re-check before a long run and
+# record the ACTUAL billed rate in the cost log at run time.
+
+provider: runpod
+pod:
+  gpu: "RTX 4090 24GB"
+  tier: community            # secure cloud ($0.89/hr) only if community stock fails
+  template: pytorch          # official RunPod PyTorch template (CUDA + torch preinstalled)
+  container_disk_gb: 40      # ephemeral; nothing important lives here
+  network_volume_gb: 100     # dataset (~24GB) + models + features; expand later if needed
+  network_volume_mount: /workspace
+
+cost:
+  gpu_hourly_rate_usd: 0.34  # RTX 4090 community list price, 2026-11-07
+  storage_monthly_usd: 7.0   # 100GB network volume at $0.07/GB/mo
+  billing: per_second        # terminate the pod when idle; never park it stopped
+
+paths_on_pod:
+  repo: /workspace/bluecad-cost-benchmark
+  data_dir: /workspace/bluecad-cost-benchmark/data/bluecad-30k
+  hf_home: /workspace/hf-cache   # keep model downloads on the network volume

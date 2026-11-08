@@ -1,0 +1,38 @@
+model_id: Qwen/Qwen3-VL-8B-Instruct
+revision: resolve_at_run
+seed: 13
+items_dir: data/official_items
+cost_log: results/costs.jsonl
+zero_shot:
+  output_dir: results/qwen3vl8b_zs
+  tasks: [task1, task1_dim, task2]
+  precision: bf16
+  batch_size: 1
+  do_sample: false
+  max_new_tokens: 2000
+finetune:
+  output_dir: results/qwen3vl8b_ft
+  adapter_dir: results/qwen3vl8b_ft/adapter
+  train_manifest: manifests/train_pairs_20000.jsonl
+  val_manifest: manifests/val_pairs_2000.jsonl
+  train_jsonl: results/qwen3vl8b_ft/train.jsonl
+  val_jsonl: results/qwen3vl8b_ft/val.jsonl
+  precision: bf16
+  load_4bit: true
+  quantization: nf4_double
+  gradient_checkpointing: true
+  lora_r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj, qkv, proj, linear_fc1, linear_fc2]
+  learning_rate: 0.0001
+  scheduler: cosine
+  warmup_ratio: 0.03
+  weight_decay: 0.0
+  epochs: 1
+  batch_size: 1
+  gradient_accumulation: 16
+  logging_steps: 10
+  save_strategy: end
+  min_pixels: 200704
+  max_pixels: 802816

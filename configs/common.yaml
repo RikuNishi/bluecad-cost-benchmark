@@ -1,0 +1,26 @@
+# Common settings shared by every experiment. Per-model files override these.
+# Values come from RESEARCH_PLAN.ja.md; change them in one place only.
+
+dataset:
+  name: bluecad-30k
+  data_dir: data/bluecad-30k        # gated download; see DATA_ACCESS_AUDIT.md
+  task1_json: data/bluecad-30k/task1.json   # official JSON, paths rewritten only
+  task2_json: data/bluecad-30k/task2.json
+
+training:
+  train_pairs: 20000                 # common pair count for the main comparison
+  pair_manifest: manifests/train_pairs_20000.jsonl  # same manifest for all models
+  seeds: [0, 1, 2]                   # main comparison runs 3 seeds (weeks 9-12)
+
+evaluation:
+  denominator: all_questions         # also report answered-only acc + answer rate
+  save_prediction_ids: true
+
+precision: bf16                      # EmbeddingGemma 2: bf16 or fp32 only
+
+cost_logging:
+  log_path: results/cost_log.jsonl   # one JSON object per run (costlog.py)
+  currency: JPY
+  # Fill in at run time from the actual rental/Colab bill; never estimate silently.
+  gpu_hourly_rate: null
+  gpu_name: null                     # e.g. "NVIDIA L4 24GB", "RTX 4090 24GB"

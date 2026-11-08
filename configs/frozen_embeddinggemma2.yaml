@@ -1,0 +1,14 @@
+model:
+  id: google/embeddinggemma-2
+  mode: frozen_encoder
+  precision: bf16
+classifier:
+  type: logistic_regression
+  trained_on: train_pairs_20000
+  epochs: 200
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  threshold: validation_accuracy_maximum
+inference:
+  batch_size: 64
+  cache_features: true

@@ -1,0 +1,15 @@
+# Qwen3-VL 8B — fine-tune following the original paper's method, on the
+# common 20,000 pairs. The paper reports training on an L4 24GB; do NOT assume
+# full fine-tuning fits 24GB (it does not). Record the actual method used
+# (LoRA/QLoRA/partial, rank, target modules) in the run metadata, because the
+# official training weights and raw logs are not published.
+model:
+  id: Qwen/Qwen3-VL-8B-Instruct   # TODO at implementation: pin revision
+  mode: finetune_official_style
+  precision: bf16
+training:
+  train_pairs: 20000
+  pair_manifest: manifests/train_pairs_20000.jsonl
+  epochs: 1
+  target_gpu: "24GB BF16 (L4 / RTX 4090 class)"
+  gradient_checkpointing: true

@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bluecad-cost"
+version = "0.1.0"
+description = "Accuracy vs compute-cost re-measurement on the official Blueprint2CAD / BlueCAD-30K benchmark"
+requires-python = ">=3.11"
+# Core logic (scoring, manifests, cost logging) is standard-library only so it
+# can be developed and tested on machines without a GPU or torch installed.
+dependencies = ["pyyaml>=6"]
+
+[project.optional-dependencies]
+# Install only on the GPU machine:  pip install -e ".[gpu]"
+gpu = [
+    "torch",
+    "bitsandbytes",
+    "transformers",
+    "accelerate",
+    "peft",
+    "trl",
+    "sentence-transformers",
+    "scikit-learn",
+    "pillow",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

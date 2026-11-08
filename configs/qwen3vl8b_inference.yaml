@@ -1,0 +1,12 @@
+# Qwen3-VL 8B — zero-shot inference on official Task 1 / Task 2
+# Target GPU: 24GB BF16 (BF16 weights ~19.6GB, so batch=1 and capped image size)
+model:
+  id: Qwen/Qwen3-VL-8B-Instruct   # TODO at implementation: pin revision
+  mode: zero_shot_generation
+  precision: bf16
+inference:
+  batch_size: 1                   # online-style condition; batch runs are separate
+  # TODO: fix and record image min/max pixels before the first measured run;
+  # image token count is part of the cost record.
+  image_max_pixels: null
+tasks: [task1, task2]

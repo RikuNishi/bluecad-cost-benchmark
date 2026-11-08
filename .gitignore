@@ -1,0 +1,23 @@
+# data and large artifacts
+data/*
+!data/README.md
+results/*
+!results/README.md
+checkpoints/
+*.safetensors
+*.bin
+*.gguf
+
+# python
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
+
+# misc
+.DS_Store
+*.log
+
+# VM download helpers (local only)
+.dl*.sh
+.dl*.log

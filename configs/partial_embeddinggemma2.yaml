@@ -1,0 +1,13 @@
+# EmbeddingGemma 2 — partial fine-tuning + the common classifier
+model:
+  id: embeddinggemma-2
+  mode: partial_finetune
+  precision: bf16
+  # TODO at implementation: record exactly which layers/blocks are trainable
+  # in the run metadata; decide the set from a small VRAM measurement first.
+  trainable_scope: null
+classifier:
+  type: common_head
+  trained_on: train_pairs_20000
+training:
+  epochs: 1
