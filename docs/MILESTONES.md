@@ -21,8 +21,13 @@
   - [x] Qwen3-VL 8B zero-shot 推論（GPU、24GB、batch=1）— 2026-11-08 完了（Task 1 0.653 / 1-dim 0.632 / Task 2 0.334、docs/M4_RESULTS.md）
   - [x] 公式方式の追加学習（共通 20,000 ペア manifest）— 2026-11-08 完了（QLoRA rank 16, lr 1e-4, 1 epoch；Task 1 0.748 / 1-dim 0.675 / Task 2 0.195、学習 3.05 GPU-h）
   - 完了条件：精度差と費用差の初期評価ができる
-- [ ] **M5（第5–8週）EmbeddingGemma 2 部分更新**
+- [x] **M5（第5–8週）EmbeddingGemma 2 部分更新** — 2026-11-09 完了（結果は docs/M5_RESULTS.md）
   - 更新範囲を小規模実測で決めてから本実行
+  - プローブで last_k vision layers k=2（学習可能 19,273,984 パラメータ）に決定。
+    Attempt 1 は scaffold head の lr 誤り（1e-5）で step ~80 で停止し、
+    head lr 1e-3 に修正して Attempt 2 が成功。Task 1 0.763 / 1-dim 0.760 /
+    Task 2 0.954（M3 凍結 EG2 比 +0.023 / +0.096 / +0.101）。学習 1.33 GPU-h、
+    再抽出 0.87 GPU-h、pod 約 $1.05。
 - [ ] **M6（第9–12週）主比較 3 seed**
   - 学習量曲線、累積処理件数 vs 総費用の曲線、性能–費用の表・図
 - [ ] **M7（第13–20週）誤り分析・拡張・執筆**
