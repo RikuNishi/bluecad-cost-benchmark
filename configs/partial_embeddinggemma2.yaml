@@ -3,7 +3,7 @@ model:
   id: google/embeddinggemma-2
   mode: partial_finetune
   precision: bf16-autocast/fp32-master
-  trainable_scope: null
+  trainable_scope: last_k:0.model.vision_tower.encoder.layers:2
 classifier:
   type: common_head
   trained_on: train_pairs_20000

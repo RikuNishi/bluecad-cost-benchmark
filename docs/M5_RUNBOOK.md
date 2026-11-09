@@ -82,3 +82,18 @@ of local encoder files identifies extracted feature provenance.
   `embed_vision.embedding_projection` (393,216) and
   `embed_vision.embedding_pre_projection_norm`. Consistency check
   passed with max cosine deviation 1.19e-07.
+
+## Probe results (2026-11-09, L4, micro-batch 8 pairs x accum 4)
+
+| scope | trainable params | peak VRAM | s/step |
+|---|---|---|---|
+| last_k:...:1 | 9,833,600 | 11.28 GB | 10.5 |
+| last_k:...:2 | 19,273,984 | 14.78 GB | 11.5 |
+| last_k:...:4 | 38,154,752 | 21.80 GB | 12.9 |
+| all | - | OOM | - |
+
+Decision rule (largest k with peak <= 20 GB) selects **k=2**
+(`last_k:0.model.vision_tower.encoder.layers:2`, 19,273,984 trainable
+encoder parameters). k=4 at 21.80 GB also sits too close to the
+22.04 GiB usable limit for a 625-step run. Consistency check passed
+again (max cosine deviation 2.38e-07).
