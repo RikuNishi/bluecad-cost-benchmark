@@ -21,6 +21,7 @@ cd "$ROOT"
 mkdir -p results
 exec >> "results/m5probe.log" 2>&1
 export HF_HOME=/workspace/hf-cache
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 pip install -q -e '.[gpu]'
 python3 scripts/train_embeddinggemma_partial.py --check-consistency 64
 python3 scripts/train_embeddinggemma_partial.py --probe

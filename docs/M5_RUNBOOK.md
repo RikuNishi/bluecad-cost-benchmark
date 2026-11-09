@@ -10,8 +10,9 @@ and validation manifests and evaluate all three official tasks. The fresh head
 uses validation labels to tune its threshold. Report those evaluation results,
 not the scaffold diagnostic. No official partial-update recipe exists; the
 following hyperparameters are our choice: AdamW, learning rate 1e-5, weight
-decay 0, cosine schedule, warmup ratio 0.03, batch 32 pairs, BF16, one epoch,
-seed 0. The forward uses SentenceTransformer's own tokenization and modules,
+decay 0, cosine schedule, warmup ratio 0.03, effective batch 32 pairs
+(micro-batch 8 pairs x gradient accumulation 4), BF16 autocast over FP32
+master weights, one epoch, seed 0. The forward uses SentenceTransformer's own tokenization and modules,
 then the same L2 normalization as extraction; no pooling is reimplemented.
 
 At startup the script prints top-level module parameter counts and all
@@ -58,3 +59,26 @@ log tail and terminate the pod on exit using `RUNPOD_POD_ID` and
 include the encoder and source revision, run configuration and diagnostic,
 features, fresh head, predictions, evaluated IDs and task metrics. A SHA-256
 of local encoder files identifies extracted feature provenance.
+
+## Deviations from the original brief (learned from probe attempts 1-2)
+
+- Batch 32 pairs in a single forward/backward OOM'd on a 24 GB card
+  (21.6 GiB allocated during the first training step of the k=1 scope;
+  activations through the vision tower + per-layer-embedding backbone
+  dominate). Training therefore uses micro-batch 8 pairs with gradient
+  accumulation 4; the effective batch, schedule and step count (625)
+  are unchanged.
+- Pure-BF16 AdamW at lr 1e-5 would round most per-step updates away
+  (the BF16 ulp at typical weight scales exceeds the update size), so
+  the encoder is trained with FP32 master weights and BF16 autocast.
+  Extraction afterwards casts the saved encoder to BF16, exactly as
+  M3's BF16 extraction did. The consistency check compares the training
+  forward against `encode` under the same autocast context.
+- The probe runs each scope in a subprocess and appends to probe.json
+  after every scope, so one scope's OOM cannot erase the others.
+- Discovered structure (probe attempt 2): total 744,371,488 params;
+  image block list `0.model.vision_tower.encoder.layers` (16 blocks,
+  151,046,144 params); always-trainable extras are the vision pooler,
+  `embed_vision.embedding_projection` (393,216) and
+  `embed_vision.embedding_pre_projection_norm`. Consistency check
+  passed with max cosine deviation 1.19e-07.

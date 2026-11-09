@@ -2,7 +2,7 @@
 model:
   id: google/embeddinggemma-2
   mode: partial_finetune
-  precision: bf16
+  precision: bf16-autocast/fp32-master
   trainable_scope: null
 classifier:
   type: common_head
@@ -13,7 +13,9 @@ training:
   weight_decay: 0.0
   schedule: cosine
   warmup_ratio: 0.03
-  batch_size: 32
+  batch_size: 32  # effective pairs per optimizer step
+  micro_batch_pairs: 8
+  grad_accum: 4
   epochs: 1
   seed: 0
 probe:
