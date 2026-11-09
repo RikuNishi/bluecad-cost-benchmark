@@ -100,9 +100,15 @@ def train_steps(model, head, optimizer, scheduler, pairs, index, torch, micro_pa
 
 
 def make_optimizer(model, head, total_steps, torch):
+    # Parameter groups: the encoder fine-tunes at 1e-5, but the fresh
+    # scaffold head needs the common head's own learning rate (1e-3, as
+    # in M3 head training). A single 1e-5 group left the head near its
+    # init for hundreds of steps (loss pinned at ln 2) and starved the
+    # encoder of gradient signal -- caught in the first full-run attempt.
     optimizer = torch.optim.AdamW(
-        [p for p in model.parameters() if p.requires_grad] + list(head.parameters()),
-        lr=1e-5, weight_decay=0.0)
+        [{'params': [p for p in model.parameters() if p.requires_grad], 'lr': 1e-5},
+         {'params': list(head.parameters()), 'lr': 1e-3}],
+        weight_decay=0.0)
     warmup = math.ceil(total_steps * .03)
 
     def lr_factor(step):
@@ -237,7 +243,7 @@ def main():
         (encoder / 'm5_provenance.json').write_text(json.dumps({'model_id': MODEL, 'resolved_revision': revision}) + '\n')
         config = {'model_id': MODEL, 'resolved_revision': revision, 'scope': scope,
                   'trainable_parameters': count, 'trainable_projection_modules': list(extra),
-                  'lr': 1e-5, 'weight_decay': 0.0, 'schedule': 'cosine', 'warmup_ratio': .03,
+                  'encoder_lr': 1e-5, 'head_lr': 1e-3, 'weight_decay': 0.0, 'schedule': 'cosine', 'warmup_ratio': .03,
                   'batch_size_pairs': MICRO_PAIRS * ACCUM, 'micro_batch_pairs': MICRO_PAIRS,
                   'grad_accum': ACCUM, 'epochs': 1, 'seed': 0,
                   'precision': 'bf16-autocast/fp32-master', 'scaffold_validation': diagnostic}

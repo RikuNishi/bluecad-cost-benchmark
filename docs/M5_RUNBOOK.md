@@ -97,3 +97,12 @@ Decision rule (largest k with peak <= 20 GB) selects **k=2**
 encoder parameters). k=4 at 21.80 GB also sits too close to the
 22.04 GiB usable limit for a 625-step run. Consistency check passed
 again (max cosine deviation 2.38e-07).
+
+## Full-run attempt 1 stopped early (2026-11-09)
+
+The first full run was stopped at step ~80/625: the scaffold loss stayed
+pinned at ln 2 (0.692-0.694). Cause: a single AdamW group at lr 1e-5 also
+governed the fresh scaffold head, which in M3 trains at lr 1e-3; at 1e-5
+the head stays near init for hundreds of steps and the encoder receives
+almost no useful gradient. Fix: parameter groups (encoder 1e-5, head
+1e-3). The partial run was discarded; nothing was saved from it.
