@@ -19,7 +19,7 @@ QUESTION = ('You are shown two images of a mechanical part. The first image is a
 LORA = dict(r=16, lora_alpha=32, lora_dropout=0.05, target_modules=[
     'q_proj', 'k_proj', 'v_proj', 'o_proj', 'gate_proj', 'up_proj', 'down_proj',
     'qkv', 'proj', 'linear_fc1', 'linear_fc2'], bias='none', task_type='CAUSAL_LM')
-MIN_PIXELS, MAX_PIXELS, SEED = 256 * 28 * 28, 1024 * 28 * 28, 13
+MIN_PIXELS, MAX_PIXELS = 256 * 28 * 28, 1024 * 28 * 28
 
 
 def messages(ex, with_answer):
@@ -39,6 +39,7 @@ def main():
     p.add_argument('--val-manifest', type=Path, default=Path('manifests/val_pairs_2000.jsonl'))
     p.add_argument('--out', type=Path, default=Path('results/qwen3vl8b_ft/adapter'))
     p.add_argument('--cost-log', type=Path, default=Path('results/costs.jsonl'))
+    p.add_argument('--seed', type=int, default=13)
     p.add_argument('--load-4bit', action='store_true')
     p.add_argument('--max-samples', type=int)
     args = p.parse_args()
@@ -57,7 +58,7 @@ def main():
         raise RuntimeError('Could not resolve model revision')
     def read(path):
         rows = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
-        random.Random(SEED).shuffle(rows)
+        random.Random(args.seed).shuffle(rows)
         for row in rows:
             if row['answer'] not in ('Yes', 'No'):
                 raise ValueError('Invalid answer')
@@ -77,13 +78,13 @@ def main():
                   lora=LORA, load_4bit=args.load_4bit, quantization='nf4_double' if args.load_4bit else 'none',
                   gradient_checkpointing=True, learning_rate=1e-4, scheduler='cosine', warmup_ratio=0.03,
                   weight_decay=0.0, epochs=1, batch_size=1, grad_accum=16, logging_steps=10,
-                  save_strategy='end', precision='bf16', seed=SEED, min_pixels=MIN_PIXELS, max_pixels=MAX_PIXELS,
+                  save_strategy='end', precision='bf16', seed=args.seed, min_pixels=MIN_PIXELS, max_pixels=MAX_PIXELS,
                   train_items=len(train), val_items=len(val), max_samples=args.max_samples)
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out.parent / 'train_config.json').write_text(json.dumps(config, indent=2) + '\n')
-    torch.manual_seed(SEED)
+    torch.manual_seed(args.seed)
     with record_run(args.cost_log, kind='qwen_ft_train', model_id=MODEL_ID, items=len(train), batch_size=1,
-                    precision='bf16' + ('/nf4' if args.load_4bit else ''), seed=SEED, notes=json.dumps(config)):
+                    precision='bf16' + ('/nf4' if args.load_4bit else ''), seed=args.seed, notes=json.dumps(config)):
         processor = AutoProcessor.from_pretrained(MODEL_ID, revision=revision, min_pixels=MIN_PIXELS, max_pixels=MAX_PIXELS)
         kw = {}
         if args.load_4bit:
@@ -113,7 +114,7 @@ def main():
         targs = TrainingArguments(output_dir=str(args.out), num_train_epochs=1, per_device_train_batch_size=1,
             gradient_accumulation_steps=16, learning_rate=1e-4, lr_scheduler_type='cosine', **warmup,
             weight_decay=0.0, bf16=True, gradient_checkpointing=True, gradient_checkpointing_kwargs={'use_reentrant': False},
-            logging_steps=10, save_strategy='no', eval_strategy='no', remove_unused_columns=False, report_to='none', seed=SEED)
+            logging_steps=10, save_strategy='no', eval_strategy='no', remove_unused_columns=False, report_to='none', seed=args.seed)
         trainer = Trainer(model=model, args=targs, train_dataset=train, eval_dataset=val, data_collator=collate)
         result = trainer.train()
         model.save_pretrained(args.out)

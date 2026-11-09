@@ -126,6 +126,7 @@ def main():
     p.add_argument('--images', type=Path, default=Path('manifests/images_all.jsonl'))
     p.add_argument('--out-dir', type=Path, default=OUT)
     p.add_argument('--cost-log', type=Path, default=Path('results/costs.jsonl'))
+    p.add_argument('--seed', type=int, default=0)
     p.add_argument('--scope')
     modes = p.add_mutually_exclusive_group()
     modes.add_argument('--probe', action='store_true')
@@ -142,8 +143,8 @@ def main():
     from PIL import Image
     if not torch.cuda.is_available() or not torch.cuda.is_bf16_supported():
         raise RuntimeError('A BF16-capable CUDA GPU is required')
-    torch.manual_seed(0)
-    random.seed(0)
+    torch.manual_seed(args.seed)
+    random.seed(args.seed)
     model = load_model(torch)
     revision = resolved_revision(MODEL)
     if not revision:
@@ -214,7 +215,7 @@ def main():
     total = math.ceil(len(train) / (MICRO_PAIRS * ACCUM))
     optimizer, scheduler = make_optimizer(model, head, total, torch)
     args.out_dir.mkdir(parents=True, exist_ok=True)
-    with record_run(args.cost_log, kind='eg2_partial_train', model_id=MODEL, items=len(train), seed=0,
+    with record_run(args.cost_log, kind='eg2_partial_train', model_id=MODEL, items=len(train), seed=args.seed,
                     batch_size=MICRO_PAIRS * ACCUM, precision='bf16-autocast/fp32-master',
                     notes=f'revision={revision}; scope={scope}; micro_pairs={MICRO_PAIRS}; accum={ACCUM}; scaffold head diagnostic only'):
         model.train()
@@ -245,7 +246,7 @@ def main():
                   'trainable_parameters': count, 'trainable_projection_modules': list(extra),
                   'encoder_lr': 1e-5, 'head_lr': 1e-3, 'weight_decay': 0.0, 'schedule': 'cosine', 'warmup_ratio': .03,
                   'batch_size_pairs': MICRO_PAIRS * ACCUM, 'micro_batch_pairs': MICRO_PAIRS,
-                  'grad_accum': ACCUM, 'epochs': 1, 'seed': 0,
+                  'grad_accum': ACCUM, 'epochs': 1, 'seed': args.seed,
                   'precision': 'bf16-autocast/fp32-master', 'scaffold_validation': diagnostic}
         (args.out_dir / 'run_config.json').write_text(json.dumps(config, indent=2) + '\n')
 
