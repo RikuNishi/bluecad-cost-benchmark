@@ -17,6 +17,16 @@ def resolved_revision(model_id):
     (e.g. SiglipConfig raises AttributeError) and on SentenceTransformer
     wrappers, which is how the first pod run failed for both encoders.
     """
+    local = Path(model_id)
+    if local.is_dir():
+        import hashlib
+        digest = hashlib.sha256()
+        for path in sorted(p for p in local.rglob('*') if p.is_file()):
+            digest.update(str(path.relative_to(local)).encode())
+            with path.open('rb') as stream:
+                for chunk in iter(lambda: stream.read(1024 * 1024), b''):
+                    digest.update(chunk)
+        return 'local-sha256:' + digest.hexdigest()
     try:
         from huggingface_hub import HfApi
         return HfApi().model_info(model_id).sha
@@ -24,13 +34,19 @@ def resolved_revision(model_id):
         return None
 
 
-def main():
+def make_parser():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--encoder', choices=MODELS, required=True)
+    p.add_argument('--model-path', default=None, help='Override the default model ID with a local directory or HF ID')
     p.add_argument('--images', type=Path, required=True)
     p.add_argument('--out', type=Path, required=True)
     p.add_argument('--batch-size', type=int, help='Override the encoder config batch size')
     p.add_argument('--cost-log', type=Path, default=Path('results/costs.jsonl'))
+    return p
+
+
+def main():
+    p = make_parser()
     args = p.parse_args()
     if args.batch_size is None:
         import re
@@ -46,7 +62,7 @@ def main():
     rows = [json.loads(line) for line in args.images.read_text().splitlines() if line.strip()]
     if len({r['image_id'] for r in rows}) != len(rows):
         raise ValueError('Duplicate image IDs')
-    model_id = MODELS[args.encoder]
+    model_id = args.model_path or MODELS[args.encoder]
     with record_run(args.cost_log, kind='extract', model_id=model_id, items=len(rows), batch_size=args.batch_size, precision='bf16') as run:
         if args.encoder == 'siglip2':
             from transformers import AutoModel, AutoProcessor

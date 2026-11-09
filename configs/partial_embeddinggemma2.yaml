@@ -1,13 +1,21 @@
-# EmbeddingGemma 2 — partial fine-tuning + the common classifier
+# Hyperparameters are our choice; there is no official partial-update recipe.
 model:
-  id: embeddinggemma-2
+  id: google/embeddinggemma-2
   mode: partial_finetune
   precision: bf16
-  # TODO at implementation: record exactly which layers/blocks are trainable
-  # in the run metadata; decide the set from a small VRAM measurement first.
   trainable_scope: null
 classifier:
   type: common_head
   trained_on: train_pairs_20000
 training:
+  optimizer: AdamW
+  lr: 0.00001
+  weight_decay: 0.0
+  schedule: cosine
+  warmup_ratio: 0.03
+  batch_size: 32
   epochs: 1
+  seed: 0
+probe:
+  candidates: ["last_k:<principal>:1", "last_k:<principal>:2", "last_k:<principal>:4", "all"]
+  steps: 3
