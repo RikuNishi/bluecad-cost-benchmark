@@ -1,0 +1,5 @@
+condition,seed,n_items,no_letter,letter_out_of_range,multiple_letters,parsed_but_wrong,parsed_correct,pred_A,pred_B,pred_C,pred_D
+qwen3vl8b_ft,0,1000,0,219,0,586,195,169,157,203,252
+qwen3vl8b_ft,1,1000,0,220,0,591,189,139,156,224,261
+qwen3vl8b_ft,2,1000,0,142,0,553,305,243,140,204,271
+qwen3vl8b_zs,0,1000,0,40,0,626,334,315,427,97,121

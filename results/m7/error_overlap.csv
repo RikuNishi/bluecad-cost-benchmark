@@ -1,0 +1,10 @@
+task,seed,n_items,all_failed,only_one_failed,none_failed
+task1,0,1000,30,215,381
+task1,1,1000,39,222,395
+task1,2,1000,39,206,404
+task1_dim,0,1000,16,234,266
+task1_dim,1,1000,36,238,320
+task1_dim,2,1000,28,249,314
+task2,0,1000,9,249,86
+task2,1,1000,10,259,82
+task2,2,1000,6,287,115
