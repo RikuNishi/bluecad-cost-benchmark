@@ -1,4 +1,4 @@
-# M7 brief — error analysis and writing (DRAFT, awaiting owner approval)
+# M7 brief — error analysis and writing (approved by owner 2026-11-10)
 
 Read `AGENTS.md` first and follow it. CPU-only work: write code + unit
 tests; no new GPU training in Parts 0–4. Any follow-up training the
@@ -110,6 +110,19 @@ condition that reaches within 0.01 of the best Task 2 accuracy, with
 the measured GPU-hours per condition (mean over seeds). Do not
 interpolate or extrapolate costs. If the answer differs by task, say
 so plainly — that is a finding, not a problem to smooth over.
+
+Figures (owner request, 2026-11-10): from the same M6 summary tables,
+produce the cost–performance figures for the write-up and for the
+owner to inspect — (1) accuracy vs mean GPU-hours scatter, one panel
+per task, one point per condition (3-seed mean ± std where the table
+carries it); (2) the frozen-encoder learning curves (accuracy vs
+training pairs, per task); (3) cumulative GPU-hours vs evaluated
+items per condition if `cumulative_cost.csv` supports it. Measured
+values only, axes labelled with units, no smoothing or fitted lines.
+`scripts/plot_m6.py` exists — extend or supersede it as needed;
+matplotlib is available on the reader pod after `pip install
+matplotlib` (it was missing during the M6 retrieval, which is why no
+figures exist yet). Save PNGs under `results/m7/figures/`.
 
 ## Part 4 — writing outline
 
