@@ -143,9 +143,11 @@ hard_neg 250 件 / positive 500 件）の公式グループ情報がある。
 
 ### 3.3 条件
 
-![エンコーダ条件のアーキテクチャ](figures/fig_arch_encoder.png)
+![エンコーダ条件のアーキテクチャ](figures/fig_arch_encoder_transformer.png)
 
-*図 2: エンコーダ条件。共有エンコーダと共通ペア head。*
+*図 2: エンコーダ条件のアーキテクチャ。共有エンコーダ（N× の
+Transformer ブロック）と共通ペア head。部分更新では最終 2 層の
+みが学習される。*
 
 **エンコーダ条件（図 2）。** 図面とレンダリングを同じ視覚
 エンコーダ E で特徴量 d, r に変換し、concat [d, r, |d−r|, d⊙r]
@@ -167,9 +169,11 @@ zero-shot とは呼ばない。
   BF16 autocast。更新範囲は小規模プローブで VRAM 上限
   （≤20 GB）から決めた。学習後は特徴を再抽出して評価する。
 
-![VLM 条件と失敗分類](figures/fig_arch_qwen.png)
+![VLM 条件のアーキテクチャ](figures/fig_arch_qwen_transformer.png)
 
-*図 3: VLM 条件。生成・パース・失敗分類の流れ。*
+*図 3: VLM 条件のアーキテクチャ（Qwen3-VL: 視覚エンコーダ +
+言語モデル）。生成文は共通パーサで解釈され、解釈できない生成は
+不正解として数える。失敗分類の内訳は表 2 に示す。*
 
 **VLM 条件（図 3）。** Qwen3-VL 8B Instruct を BF16・greedy・
 batch 1 で使う。生成文は item ごとに原文のまま保存する。
