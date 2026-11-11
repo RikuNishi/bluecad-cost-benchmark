@@ -1,0 +1,5 @@
+condition,seed,n_items,n_with_letter,exact_correct,accuracy_all,accuracy_among_lettered,one_past,one_past_share_all,one_past_share_lettered,one_before,one_before_share_all,shifted_back_correct,shifted_back_accuracy_all,tax_no_letter,tax_letter_out_of_range,tax_multiple_letters,tax_parsed_but_wrong,tax_parsed_correct,pred_A,pred_B,pred_C,pred_D,pred_E
+qwen3vl8b_ft,0,1000,1000,195,0.195,0.195,733,0.733,0.733,24,0.024,733,0.733,0,219,0,586,195,169,157,203,252,219
+qwen3vl8b_ft,1,1000,1000,189,0.189,0.189,777,0.777,0.777,12,0.012,777,0.777,0,220,0,591,189,139,156,224,261,220
+qwen3vl8b_ft,2,1000,1000,305,0.305,0.305,599,0.599,0.599,20,0.02,599,0.599,0,142,0,553,305,243,140,204,271,142
+qwen3vl8b_zs,0,1000,1000,334,0.334,0.334,332,0.332,0.332,99,0.099,332,0.332,0,40,0,626,334,315,427,97,121,40
